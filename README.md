@@ -11,41 +11,70 @@ A Laravel application for managing lender identities, accounts, and profiles wit
 - **Profile Management** - Automatically create profiles when creating accounts
 - **Paxos API Integration** - Seamless integration with Paxos sandbox API
 
-## Installation
+## Requirements
 
-1. **Clone/Navigate to the project directory:**
-   ```bash
-   cd /home/mugambi/paxos
-   ```
+- PHP **8.2+** (with common extensions: `openssl`, `pdo`, `mbstring`, `tokenizer`, `xml`, `ctype`, `json`, `fileinfo`)
+- [Composer](https://getcomposer.org/)
+- [Node.js](https://nodejs.org/) + npm (for Vite / frontend assets)
 
-2. **Install dependencies:**
+## Local setup and running
+
+### Option A: One-shot setup (recommended)
+
+From the project root:
+
+```bash
+composer run setup
+```
+
+This runs `composer install`, creates `.env` from `.env.example` if missing, `php artisan key:generate`, `php artisan migrate`, `npm install`, and `npm run build`.
+
+Then configure **Paxos** (and optional **APP_URL**) in `.env` (see below), and start the app.
+
+### Option B: Manual setup
+
+1. **Install PHP dependencies**
+
    ```bash
    composer install
    ```
 
-3. **Set up environment:**
+2. **Environment file**
+
    ```bash
    cp .env.example .env
    php artisan key:generate
    ```
 
-4. **Configure database:**
-   The project uses SQLite by default. Create the database file:
+3. **Database**
+
+   Default `.env` uses **SQLite**. Ensure the file exists:
+
    ```bash
    touch database/database.sqlite
    ```
-   
-   Or configure MySQL/PostgreSQL in `.env`:
-   ```env
-   DB_CONNECTION=mysql
-   DB_HOST=127.0.0.1
-   DB_PORT=3306
-   DB_DATABASE=paxos
-   DB_USERNAME=root
-   DB_PASSWORD=
+
+   For MySQL/PostgreSQL, set `DB_*` in `.env` instead of SQLite.
+
+4. **Migrate**
+
+   ```bash
+   php artisan migrate
    ```
 
-5. **Configure Paxos API credentials in `.env`:**
+5. **Frontend assets**
+
+   ```bash
+   npm install
+   npm run build
+   ```
+
+   For active UI work, use `npm run dev` (often together with `php artisan serve`; see **Running** below).
+
+6. **Paxos API** (required for identity/account flows against Paxos)
+
+   In `.env`:
+
    ```env
    PAXOS_BASE_URL=https://api.sandbox.paxos.com
    PAXOS_API_TOKEN=your_api_token
@@ -54,17 +83,43 @@ A Laravel application for managing lender identities, accounts, and profiles wit
    PAXOS_SCOPE=identity:write_identity identity:read_identity identity:write_account identity:read_account
    ```
 
-6. **Run migrations:**
+   Set `APP_URL` to match how you access the app (e.g. `http://127.0.0.1:8000`).
+
+7. **Seed demo users (optional)**
+
    ```bash
-   php artisan migrate
+   php artisan db:seed
    ```
 
-7. **Start the development server:**
-   ```bash
-   php artisan serve
-   ```
+   See `database/seeders/UserSeeder.php` for emails/passwords (default password is `password`).
 
-   The application will be available at `http://localhost:8000`
+### Running the application
+
+**All-in-one dev stack** (Laravel server, queue worker, logs, Vite):
+
+```bash
+composer run dev
+```
+
+**Minimal** (two terminals):
+
+```bash
+php artisan serve
+```
+
+```bash
+npm run dev
+```
+
+Then open the URL shown by `serve` (typically `http://127.0.0.1:8000`).
+
+**Production-style assets** (no Vite dev server): after `npm run build`, only `php artisan serve` (or your web server) is needed.
+
+### Tests
+
+```bash
+composer run test
+```
 
 ## Usage
 
@@ -158,4 +213,5 @@ resources/
 
 - **API Token Issues**: Make sure your Paxos credentials are correctly set in `.env`
 - **Database Issues**: Ensure migrations have been run and the database file exists (for SQLite)
+- **Vite / manifest errors**: Run `npm run dev` while developing, or `npm run build` for a production-style asset build
 - **Authentication Issues**: Clear cache with `php artisan cache:clear` and `php artisan config:clear`

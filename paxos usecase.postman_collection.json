@@ -1,0 +1,559 @@
+{
+	"info": {
+		"_postman_id": "ca13d26a-070d-454a-a7a4-9184f06afae0",
+		"name": "paxos usecase",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "41172859"
+	},
+	"item": [
+		{
+			"name": "lender",
+			"item": [
+				{
+					"name": "fiat",
+					"item": [
+						{
+							"name": "create fiat account",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{paxos_api_token}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "\n{\n  \n  \"fiat_network_instructions\": {\n    \"wire\": {\n      \"account_number\": \"12345677\",\n      \"routing_details\": {\n        \"routing_number\": \"031302971\",\n        \"routing_number_type\":\"ABA\",\n        \"bank_name\": \"Customers Bank\",\n        \"bank_address\": {\n          \"country\": \"USA\"\n        }\n      },\n      \"fiat_account_owner_address\": {\n        \"address1\": \"456 Main Street\",\n        \"city\": \"NY\",\n        \"country\": \"USA\"\n      }\n    }\n  },\n  \"fiat_account_owner\": {\n    \"person_details\": {\n      \"first_name\": \"John\",\n      \"last_name\": \"Doe Lender\"\n    }\n  }\n}\n",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "https://api.sandbox.paxos.com/v2/transfer/fiat-accounts",
+									"protocol": "https",
+									"host": [
+										"api",
+										"sandbox",
+										"paxos",
+										"com"
+									],
+									"path": [
+										"v2",
+										"transfer",
+										"fiat-accounts"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "get fiat account",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{paxos_api_token}}",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "https://api.sandbox.paxos.com/v2/transfer/fiat-accounts/7f5ef326-c24c-4b69-901d-9aa1eae5ff92",
+									"protocol": "https",
+									"host": [
+										"api",
+										"sandbox",
+										"paxos",
+										"com"
+									],
+									"path": [
+										"v2",
+										"transfer",
+										"fiat-accounts",
+										"7f5ef326-c24c-4b69-901d-9aa1eae5ff92"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "create fiat deposit instructions",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{paxos_api_token}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "\n{\n  \n  \"fiat_network_instructions\": {\n    \"wire\": {\n      \"account_number\": \"12345677\",\n      \"routing_details\": {\n        \"routing_number\": \"031302971\",\n        \"routing_number_type\":\"ABA\",\n        \"bank_name\": \"Customers Bank\",\n        \"bank_address\": {\n          \"country\": \"USA\"\n        }\n      },\n      \"fiat_account_owner_address\": {\n        \"address1\": \"456 Main Street\",\n        \"city\": \"NY\",\n        \"country\": \"USA\"\n      }\n    }\n  },\n  \"fiat_account_owner\": {\n    \"person_details\": {\n      \"first_name\": \"John\",\n      \"last_name\": \"Doe Lender\"\n    }\n  }\n}\n",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "https://api.sandbox.paxos.com/v2/transfer/fiat-accounts",
+									"protocol": "https",
+									"host": [
+										"api",
+										"sandbox",
+										"paxos",
+										"com"
+									],
+									"path": [
+										"v2",
+										"transfer",
+										"fiat-accounts"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "sandbox fiat deposit",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{paxos_api_token}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"amount\": \"1000.00\",\n  \"asset\": \"USD\",\n  \"memo_id\": \"3CFSMN7X43WDBYLL\",\n  \"fiat_network_instructions\": {\n    \"wire\": {\n      \"account_number\": \"12345678\",\n      \"fiat_account_owner_address\": {\n        \"country\": \"USA\",\n        \"address1\": \"456 Main Street, NY\",\n        \"city\": \"New York\",\n        \"province\": \"NY\",\n        \"address2\": \"\",\n        \"zip_code\": \"10101\"\n      },\n      \"routing_details\": {\n        \"routing_number_type\": \"ABA\",\n        \"routing_number\": \"123456789\",\n        \"bank_name\": \"Customers Bank\",\n        \"bank_address\": {\n          \"country\": \"USA\",\n          \"address1\": \"123 Bank Street\",\n          \"city\": \"New York\",\n          \"province\": \"NY\",\n          \"address2\": \"\",\n          \"zip_code\": \"10101\"\n        }\n      }\n    }\n  },\n  \"fiat_account_owner\": {\n    \"institution_details\": {\n      \"name\": \"SomeCorp, Inc.\"\n    }\n  }\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "https://api.sandbox.paxos.com/v2/sandbox/fiat-deposits",
+									"protocol": "https",
+									"host": [
+										"api",
+										"sandbox",
+										"paxos",
+										"com"
+									],
+									"path": [
+										"v2",
+										"sandbox",
+										"fiat-deposits"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "fiat withdrawal",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{paxos_api_token}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"amount\": \"1000.00\",\n  \"asset\": \"USD\",\n  \"memo_id\": \"3CFSMN7X43WDBYLL\",\n  \"fiat_network_instructions\": {\n    \"wire\": {\n      \"account_number\": \"12345678\",\n      \"fiat_account_owner_address\": {\n        \"country\": \"USA\",\n        \"address1\": \"456 Main Street, NY\",\n        \"city\": \"New York\",\n        \"province\": \"NY\",\n        \"address2\": \"\",\n        \"zip_code\": \"10101\"\n      },\n      \"routing_details\": {\n        \"routing_number_type\": \"ABA\",\n        \"routing_number\": \"123456789\",\n        \"bank_name\": \"Customers Bank\",\n        \"bank_address\": {\n          \"country\": \"USA\",\n          \"address1\": \"123 Bank Street\",\n          \"city\": \"New York\",\n          \"province\": \"NY\",\n          \"address2\": \"\",\n          \"zip_code\": \"10101\"\n        }\n      }\n    }\n  },\n  \"fiat_account_owner\": {\n    \"institution_details\": {\n      \"name\": \"SomeCorp, Inc.\"\n    }\n  }\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "https://api.sandbox.paxos.com/v2/sandbox/fiat-deposits",
+									"protocol": "https",
+									"host": [
+										"api",
+										"sandbox",
+										"paxos",
+										"com"
+									],
+									"path": [
+										"v2",
+										"sandbox",
+										"fiat-deposits"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "create a lender identity",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{paxos_api_token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"person_details\": {\n    \"verifier_type\": \"PAXOS\",\n    \"first_name\": \"Jane\",\n    \"last_name\": \"Doe\",\n    \"date_of_birth\": \"1990-01-15\",\n    \"address\": {\n      \"country\": \"US\",\n      \"address1\": \"123 Main Street\",\n      \"city\": \"New York\",\n      \"province\": \"NY\",\n      \"zip_code\": \"10001\"\n    },\n     \"nationality\": \"USA\",\n        \"cip_id\": \"073-05-1121\",\n        \"cip_id_type\": \"SSN\",\n        \"cip_id_country\": \"USA\",\n        \"phone_number\": \"+1 555 678 1235\",\n        \"email\": \"example@somemail1.org\"\n    }\n  ,\n  \"ref_id\": \"33ece656-eef1-43b5-a851-b6b9099089b4\"\n}\n\n\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://api.sandbox.paxos.com/v2/identity/identities",
+							"protocol": "https",
+							"host": [
+								"api",
+								"sandbox",
+								"paxos",
+								"com"
+							],
+							"path": [
+								"v2",
+								"identity",
+								"identities"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "approve identity(sandbox)",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{paxos_api_token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \n  \"id_verification_status\": \"APPROVED\",\n  \"sanctions_verification_status\": \"APPROVED\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://api.sandbox.paxos.com/v2/identity/identities/c38b7fed-b7da-4b97-a681-7bbc208da8f8/sandbox-status",
+							"protocol": "https",
+							"host": [
+								"api",
+								"sandbox",
+								"paxos",
+								"com"
+							],
+							"path": [
+								"v2",
+								"identity",
+								"identities",
+								"c38b7fed-b7da-4b97-a681-7bbc208da8f8",
+								"sandbox-status"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get Identity",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{paxos_api_token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "https://api.sandbox.paxos.com/v2/identity/identities",
+							"protocol": "https",
+							"host": [
+								"api",
+								"sandbox",
+								"paxos",
+								"com"
+							],
+							"path": [
+								"v2",
+								"identity",
+								"identities"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "single owner account/profile",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{paxos_api_token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"create_profile\": true,\n    \"account\": {\n        \"identity_id\": \"c38b7fed-b7da-4b97-a681-7bbc208da8f8\",\n        \"ref_id\": \"33ece656-eef1-43b5-a851-b6b909908974\",\n        \"type\": \"BROKERAGE\",\n        \"description\": \"Brokerage account for John Doe Lender\"\n    }\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://api.sandbox.paxos.com/v2/identity/accounts",
+							"protocol": "https",
+							"host": [
+								"api",
+								"sandbox",
+								"paxos",
+								"com"
+							],
+							"path": [
+								"v2",
+								"identity",
+								"accounts"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "list accounts",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{paxos_api_token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "https://api.sandbox.paxos.com/v2/identity/accounts",
+							"protocol": "https",
+							"host": [
+								"api",
+								"sandbox",
+								"paxos",
+								"com"
+							],
+							"path": [
+								"v2",
+								"identity",
+								"accounts"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "fiat deposit instruction Cubix Copy",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{paxos_api_token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"profile_id\": \"30e2d6c4-9a86-4c9d-ad57-1331ca3adb56\",\n  \"fiat_network\": \"CUBIX\",\n \n  \"account_ id\": \"5a4c3ccc-00fd-45c9-97e4-320a550cd12e\",\n  \"ref_id\": \"33ece656-eef1-43b5-a851-b6b9099089b7\",\n  \"metadata\": {\n    \"my_id\": \"30e2d6c4-9a86-4c9d-ad57-1331ca3adb56\"\n  }\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://api.sandbox.paxos.com/v2/transfer/fiat-deposit-instructions",
+							"protocol": "https",
+							"host": [
+								"api",
+								"sandbox",
+								"paxos",
+								"com"
+							],
+							"path": [
+								"v2",
+								"transfer",
+								"fiat-deposit-instructions"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "sandbox fiat deposit Cubix",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{paxos_api_token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"amount\": \"1000.00\",\n  \"asset\": \"USD\",\n  \"memo_id\": \"3CFVNXLN75FNCXX5\",\n    \"fiat_network_instructions\": {\n    \"cubix\": {\n      \"account_id\": \"f7fcaa3d-e8d3-4c4f-b84f-b212015be8c3\"\n    }\n    \n  },\n  \"fiat_account_owner\": {\n    \"institution_details\": {\n      \"name\": \"SomeCorp, Inc.\"\n    }\n  }\n}\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://api.sandbox.paxos.com/v2/sandbox/fiat-deposits",
+							"protocol": "https",
+							"host": [
+								"api",
+								"sandbox",
+								"paxos",
+								"com"
+							],
+							"path": [
+								"v2",
+								"sandbox",
+								"fiat-deposits"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Authenticate",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// Parse the response JSON",
+							"let jsonData = pm.response.json();",
+							"",
+							"// Set environment variable with the access token",
+							"if (jsonData.access_token) {",
+							"    pm.environment.set(\"paxos_api_token\", jsonData.access_token);",
+							"    console.log(\"Paxos token updated:\", jsonData.access_token);",
+							"} else {",
+							"    console.warn(\"No access token found in response.\");",
+							"}"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "grant_type",
+							"value": "client_credentials",
+							"type": "text"
+						},
+						{
+							"key": "client_id",
+							"value": "1cdcee60-42e7-4a54-b036-a62eb17e855d",
+							"type": "text"
+						},
+						{
+							"key": "client_secret",
+							"value": "NRIK3W2SGK7CYNWMOIPJD77HLA",
+							"type": "text"
+						},
+						{
+							"key": "scope",
+							"value": "conversion:read_conversion_stablecoin conversion:write_conversion_stablecoin funding:read_profile funding:write_profile transfer:read_deposit_address transfer:read_transfer transfer:read_fiat_account transfer:read_fiat_deposit_instructions transfer:write_internal_transfer transfer:write_crypto_withdrawal transfer:write_deposit_address transfer:write_fiat_account transfer:write_fiat_deposit_instructions transfer:write_fiat_withdrawal identity:write_identity identity:read_identity identity:write_account identity:read_account identity:write_account transfer:write_paxos_transfer transfer:write_fiat_deposit_instructions orchestration:write_orchestration_rule transfer:write_sandbox_fiat_deposit events:read_event orchestration:read_orchestration transfer:write_fiat_account transfer:read_fiat_account orchestration:write_orchestration transfer:write_fiat_withdrawal",
+							"type": "text"
+						},
+						{
+							"key": "scope",
+							"value": "identity:write_identity",
+							"type": "text",
+							"disabled": true
+						}
+					]
+				},
+				"url": {
+					"raw": "https://oauth.sandbox.paxos.com/oauth2/token",
+					"protocol": "https",
+					"host": [
+						"oauth",
+						"sandbox",
+						"paxos",
+						"com"
+					],
+					"path": [
+						"oauth2",
+						"token"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "New Request",
+			"request": {
+				"method": "GET",
+				"header": []
+			},
+			"response": []
+		}
+	]
+}

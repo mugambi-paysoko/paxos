@@ -1,0 +1,36 @@
+{
+  "ref_id": "cfa171b6-1886-4976-bdc1-75ab0c6df4e3",
+  "institution_members": [
+    {
+      "identity_id": "bde5670a-1fa0-4c43-ac5c-1bbf277a42f1",
+      "roles": [
+        "BENEFICIAL_OWNER",
+        "AUTHORIZED_USER",
+        "MANAGEMENT_CONTROL_PERSON"
+      ]
+    }
+  ],
+  "institution_details": {
+    "name": "Victor Financials LLC",
+    "email": "victorfinancials@info.com",
+    "institution_type": "LLC",
+    "business_address": {
+      "country": "USA",
+      "address1": "123 Main Street",
+      "city": "New York",
+      "province": "NY",
+      "zip_code": "10001"
+    },
+    "cip_id": "12-3456789",
+    "cip_id_type": "EIN",
+    "cip_id_country": "USA",
+    "institution_sub_type": "HEDGE_FUND",
+    "govt_registration_date": "2017-01-09",
+    "regulation_status": "US_REGULATED",
+    "trading_type": "PRIVATE",
+    "regulator_name": "New York State Department of Financial Services",
+    "regulator_jurisdiction": "US-NY",
+    "regulator_register_number": "123456789",
+    "business_description": "we are testing"
+  }
+}
