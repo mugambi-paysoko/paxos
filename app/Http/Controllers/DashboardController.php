@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
+use App\Services\BorrowerBalanceService;
 
 class DashboardController extends Controller
 {
@@ -11,16 +11,23 @@ class DashboardController extends Controller
         $this->middleware('auth');
     }
 
-    public function index()
+    public function index(BorrowerBalanceService $borrowerBalanceService)
     {
         $user = auth()->user();
-        
+
         $stats = [
             'identities_count' => $user->identities()->count(),
             'accounts_count' => $user->accounts()->count(),
             'profiles_count' => $user->profiles()->count(),
         ];
 
-        return view('dashboard', compact('stats'));
+        $borrowerBalanceData = null;
+        $borrowerBalanceCard = null;
+        if ($user->can('borrower')) {
+            $borrowerBalanceData = $borrowerBalanceService->summarizeForUser($user);
+            $borrowerBalanceCard = $borrowerBalanceService->dashboardCardFromSummary($borrowerBalanceData);
+        }
+
+        return view('dashboard', compact('stats', 'borrowerBalanceData', 'borrowerBalanceCard'));
     }
 }

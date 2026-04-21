@@ -167,6 +167,7 @@ The application implements the following Paxos API endpoints based on the Postma
 - `PUT /v2/identity/identities/{id}/sandbox-status` - Approve identity (sandbox)
 - `POST /v2/identity/accounts` - Create account (with optional profile)
 - `GET /v2/identity/accounts` - List accounts
+- `POST /v2/transfer/deposit-addresses` - Create crypto deposit address for a profile (requires `transfer:write_deposit_address` in `PAXOS_SCOPE`)
 
 ## Project Structure
 
@@ -211,6 +212,8 @@ resources/
 
 ## Troubleshooting
 
+- **Deposit address 403 (“identity_id and account_id forbidden for first-party customers”)**: Your Paxos org is first-party. Keep `PAXOS_FIRST_PARTY=true` (default) so those fields are not sent. For third-party integrations, set `PAXOS_FIRST_PARTY=false` in `.env`.
+- **Fiat account 403 (“identity_id forbidden for first-party customers”)**: Same fix as above — first-party integrations must omit `identity_id` / `account_id` on transfer APIs. Keep `PAXOS_FIRST_PARTY=true`.
 - **API Token Issues**: Make sure your Paxos credentials are correctly set in `.env`
 - **Database Issues**: Ensure migrations have been run and the database file exists (for SQLite)
 - **Vite / manifest errors**: Run `npm run dev` while developing, or `npm run build` for a production-style asset build

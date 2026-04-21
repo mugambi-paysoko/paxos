@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class FiatAccount extends Model
 {
@@ -33,5 +34,10 @@ class FiatAccount extends Model
     public function identity(): BelongsTo
     {
         return $this->belongsTo(Identity::class);
+    }
+
+    public function fiatWithdrawals(): HasMany
+    {
+        return $this->hasMany(FiatWithdrawal::class);
     }
 }

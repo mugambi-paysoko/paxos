@@ -21,11 +21,19 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         Gate::define('lender', function ($user) {
-            return $user->isLender() || $user->isAdmin();
+            return $user->isInstitution() || $user->isAdmin();
         });
 
         Gate::define('borrower', function ($user) {
-            return $user->isBorrower() || $user->isAdmin();
+            return $user->isIndividual() || $user->isAdmin();
+        });
+
+        Gate::define('institution', function ($user) {
+            return $user->isInstitution() || $user->isAdmin();
+        });
+
+        Gate::define('individual', function ($user) {
+            return $user->isIndividual() || $user->isAdmin();
         });
     }
 }

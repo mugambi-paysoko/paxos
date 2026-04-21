@@ -1,284 +1,244 @@
 @extends('layouts.app')
 
-@section('title', 'Identity Details')
+@section('title', 'Identity details')
+
+@section('page_actions')
+    @if ($identity->id_verification_status !== 'APPROVED')
+        <form action="{{ route('lender.identities.approve', $identity) }}" method="POST" class="d-inline">
+            @csrf
+            <button type="submit" class="btn btn-success rounded-3">
+                <i class="ti ti-check me-1"></i> Approve (sandbox)
+            </button>
+        </form>
+    @endif
+    <a href="{{ route('lender.identities.index') }}" class="btn btn-outline-secondary rounded-3">Back</a>
+@endsection
 
 @section('content')
-<div class="py-6">
-    <div class="flex justify-between items-center mb-6">
-        <h1 class="text-3xl font-bold text-gray-900">Identity Details</h1>
-        <div>
-            @if($identity->id_verification_status !== 'APPROVED')
-            <form action="{{ route('lender.identities.approve', $identity) }}" method="POST" class="inline">
-                @csrf
-                <button type="submit" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
-                    Approve (Sandbox)
-                </button>
-            </form>
-            @endif
-            <a href="{{ route('lender.identities.index') }}" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded ml-2">
-                Back
-            </a>
+    <div class="row g-4 mb-4">
+        <div class="col-md-4">
+            <div class="card shadow-sm border-0 rounded-4 h-100">
+                <div class="card-body p-4">
+                    <p class="fs-2 text-muted mb-1">Identity type</p>
+                    <p class="mb-0 fw-semibold">{{ $identity->identity_type === 'INSTITUTION' ? 'Institution' : 'Individual' }}</p>
+                    <p class="mb-0 mt-1 fs-3 text-muted text-break">{{ $identity->email }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card shadow-sm border-0 rounded-4 h-100">
+                <div class="card-body p-4">
+                    <p class="fs-2 text-muted mb-1">ID verification</p>
+                    <span class="badge rounded-pill {{ $identity->id_verification_status === 'APPROVED' ? 'text-bg-success' : ($identity->id_verification_status === 'REJECTED' ? 'text-bg-danger' : 'text-bg-warning') }}">{{ $identity->id_verification_status }}</span>
+                    <p class="mb-0 mt-3 fs-2 text-muted">Sanctions</p>
+                    <span class="badge rounded-pill {{ $identity->sanctions_verification_status === 'APPROVED' ? 'text-bg-success' : ($identity->sanctions_verification_status === 'REJECTED' ? 'text-bg-danger' : 'text-bg-warning') }}">{{ $identity->sanctions_verification_status }}</span>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card shadow-sm border-0 rounded-4 h-100">
+                <div class="card-body p-4">
+                    <p class="fs-2 text-muted mb-1">Paxos identity ID</p>
+                    <p class="mb-0 fw-semibold font-monospace small text-break">{{ $identity->paxos_identity_id ?? 'N/A' }}</p>
+                    <p class="mb-0 mt-3 fs-2 text-muted">Reference ID</p>
+                    <p class="mb-0 font-monospace small text-break">{{ $identity->ref_id }}</p>
+                </div>
+            </div>
         </div>
     </div>
 
-    <div class="bg-white shadow rounded-lg p-6">
-        @if($identity->identity_type === 'INSTITUTION')
-            <!-- Institution Identity Display -->
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                    <h3 class="text-lg font-semibold text-gray-900 mb-4">Institution Information</h3>
-                    <dl class="grid grid-cols-1 gap-x-4 gap-y-6">
-                        <div>
-                            <dt class="text-sm font-medium text-gray-500">Institution Name</dt>
-                            <dd class="mt-1 text-sm text-gray-900">{{ $identity->institution_details['name'] ?? 'N/A' }}</dd>
-                        </div>
-                        <div>
-                            <dt class="text-sm font-medium text-gray-500">Institution Type</dt>
-                            <dd class="mt-1 text-sm text-gray-900">{{ $identity->institution_details['institution_type'] ?? 'N/A' }}</dd>
-                        </div>
-                        <div>
-                            <dt class="text-sm font-medium text-gray-500">Institution Sub Type</dt>
-                            <dd class="mt-1 text-sm text-gray-900">{{ $identity->institution_details['institution_sub_type'] ?? 'N/A' }}</dd>
-                        </div>
-                        <div>
-                            <dt class="text-sm font-medium text-gray-500">Email</dt>
-                            <dd class="mt-1 text-sm text-gray-900">{{ $identity->email }}</dd>
-                        </div>
-                        <div>
-                            <dt class="text-sm font-medium text-gray-500">CIP ID</dt>
-                            <dd class="mt-1 text-sm text-gray-900">{{ $identity->institution_details['cip_id'] ?? 'N/A' }}</dd>
-                        </div>
-                        <div>
-                            <dt class="text-sm font-medium text-gray-500">CIP ID Type</dt>
-                            <dd class="mt-1 text-sm text-gray-900">{{ $identity->institution_details['cip_id_type'] ?? 'N/A' }}</dd>
-                        </div>
-                        @if(!empty($identity->institution_details['govt_registration_date']))
-                        <div>
-                            <dt class="text-sm font-medium text-gray-500">Government Registration Date</dt>
-                            <dd class="mt-1 text-sm text-gray-900">{{ $identity->institution_details['govt_registration_date'] }}</dd>
-                        </div>
-                        @endif
-                        @if(!empty($identity->institution_details['regulation_status']))
-                        <div>
-                            <dt class="text-sm font-medium text-gray-500">Regulation Status</dt>
-                            <dd class="mt-1 text-sm text-gray-900">{{ $identity->institution_details['regulation_status'] }}</dd>
-                        </div>
-                        @endif
-                        @if(!empty($identity->institution_details['trading_type']))
-                        <div>
-                            <dt class="text-sm font-medium text-gray-500">Trading Type</dt>
-                            <dd class="mt-1 text-sm text-gray-900">{{ $identity->institution_details['trading_type'] }}</dd>
-                        </div>
-                        @endif
-                    </dl>
-                </div>
-
-                <div>
-                    <h3 class="text-lg font-semibold text-gray-900 mb-4">Business Address</h3>
-                    <dl class="grid grid-cols-1 gap-x-4 gap-y-6">
-                        @if(!empty($identity->institution_details['business_address']))
-                        <div>
-                            <dt class="text-sm font-medium text-gray-500">Address</dt>
-                            <dd class="mt-1 text-sm text-gray-900">{{ $identity->institution_details['business_address']['address1'] ?? 'N/A' }}</dd>
-                        </div>
-                        <div>
-                            <dt class="text-sm font-medium text-gray-500">City</dt>
-                            <dd class="mt-1 text-sm text-gray-900">{{ $identity->institution_details['business_address']['city'] ?? 'N/A' }}</dd>
-                        </div>
-                        <div>
-                            <dt class="text-sm font-medium text-gray-500">Province/State</dt>
-                            <dd class="mt-1 text-sm text-gray-900">{{ $identity->institution_details['business_address']['province'] ?? 'N/A' }}</dd>
-                        </div>
-                        <div>
-                            <dt class="text-sm font-medium text-gray-500">Zip Code</dt>
-                            <dd class="mt-1 text-sm text-gray-900">{{ $identity->institution_details['business_address']['zip_code'] ?? 'N/A' }}</dd>
-                        </div>
-                        <div>
-                            <dt class="text-sm font-medium text-gray-500">Country</dt>
-                            <dd class="mt-1 text-sm text-gray-900">{{ $identity->institution_details['business_address']['country'] ?? 'N/A' }}</dd>
-                        </div>
-                        @endif
-                    </dl>
+    @if ($identity->identity_type === 'INSTITUTION')
+        <div class="card shadow-sm border-0 rounded-4 mb-4">
+            <div class="card-body p-4 p-md-5">
+                <h5 class="fw-semibold mb-3">Institution details</h5>
+                <div class="table-responsive">
+                    <table class="table align-middle mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Field</th>
+                                <th>Value</th>
+                                <th>Field</th>
+                                <th>Value</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="text-muted">Institution name</td>
+                                <td>{{ $identity->institution_details['name'] ?? 'N/A' }}</td>
+                                <td class="text-muted">Institution type</td>
+                                <td>{{ $identity->institution_details['institution_type'] ?? 'N/A' }}</td>
+                            </tr>
+                            <tr>
+                                <td class="text-muted">Sub type</td>
+                                <td>{{ $identity->institution_details['institution_sub_type'] ?? 'N/A' }}</td>
+                                <td class="text-muted">CIP ID</td>
+                                <td>{{ $identity->institution_details['cip_id'] ?? 'N/A' }}</td>
+                            </tr>
+                            <tr>
+                                <td class="text-muted">CIP ID type</td>
+                                <td>{{ $identity->institution_details['cip_id_type'] ?? 'N/A' }}</td>
+                                <td class="text-muted">Government registration</td>
+                                <td>{{ $identity->institution_details['govt_registration_date'] ?? 'N/A' }}</td>
+                            </tr>
+                            <tr>
+                                <td class="text-muted">Regulation status</td>
+                                <td>{{ $identity->institution_details['regulation_status'] ?? 'N/A' }}</td>
+                                <td class="text-muted">Trading type</td>
+                                <td>{{ $identity->institution_details['trading_type'] ?? 'N/A' }}</td>
+                            </tr>
+                            <tr>
+                                <td class="text-muted">Business address</td>
+                                <td>{{ $identity->institution_details['business_address']['address1'] ?? 'N/A' }}</td>
+                                <td class="text-muted">City / country</td>
+                                <td>{{ ($identity->institution_details['business_address']['city'] ?? 'N/A').' / '.($identity->institution_details['business_address']['country'] ?? 'N/A') }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
             </div>
+        </div>
 
-            @if(!empty($identity->institution_members))
-            <div class="mt-6 pt-6 border-t border-gray-200">
-                <h3 class="text-lg font-semibold text-gray-900 mb-4">Institution Members</h3>
-                <div class="space-y-4">
-                    @foreach($identity->institution_members as $member)
-                    <div class="bg-gray-50 rounded-lg p-4">
-                        <div class="font-semibold text-gray-900">{{ $member['name'] ?? 'N/A' }}</div>
-                        <div class="text-sm text-gray-600 mt-1">
-                            <span class="font-medium">Roles:</span> {{ implode(', ', $member['roles'] ?? []) }}
-                        </div>
+        @if (! empty($identity->institution_members))
+            <div class="card shadow-sm border-0 rounded-4 mb-4">
+                <div class="card-body p-4 p-md-5">
+                    <h5 class="fw-semibold mb-3">Institution members</h5>
+                    <div class="table-responsive">
+                        <table class="table align-middle mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Roles</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach ($identity->institution_members as $member)
+                                    <tr>
+                                        <td class="fw-semibold">{{ $member['name'] ?? 'N/A' }}</td>
+                                        <td>{{ implode(', ', $member['roles'] ?? []) }}</td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
                     </div>
-                    @endforeach
-                </div>
-            </div>
-            @endif
-
-            @if(!empty($identity->institution_details['business_description']))
-            <div class="mt-6 pt-6 border-t border-gray-200">
-                <h3 class="text-lg font-semibold text-gray-900 mb-4">Business Description</h3>
-                <p class="text-sm text-gray-900">{{ $identity->institution_details['business_description'] }}</p>
-            </div>
-            @endif
-        @else
-            <!-- Person Identity Display -->
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                    <h3 class="text-lg font-semibold text-gray-900 mb-4">Personal Information</h3>
-                    <dl class="grid grid-cols-1 gap-x-4 gap-y-6 sm:grid-cols-2">
-                        <div>
-                            <dt class="text-sm font-medium text-gray-500">First Name</dt>
-                            <dd class="mt-1 text-sm text-gray-900">{{ $identity->first_name }}</dd>
-                        </div>
-                        <div>
-                            <dt class="text-sm font-medium text-gray-500">Last Name</dt>
-                            <dd class="mt-1 text-sm text-gray-900">{{ $identity->last_name }}</dd>
-                        </div>
-                        <div>
-                            <dt class="text-sm font-medium text-gray-500">Date of Birth</dt>
-                            <dd class="mt-1 text-sm text-gray-900">{{ $identity->date_of_birth ? $identity->date_of_birth->format('Y-m-d') : 'N/A' }}</dd>
-                        </div>
-                        <div>
-                            <dt class="text-sm font-medium text-gray-500">Nationality</dt>
-                            <dd class="mt-1 text-sm text-gray-900">{{ $identity->nationality }}</dd>
-                        </div>
-                        <div>
-                            <dt class="text-sm font-medium text-gray-500">Email</dt>
-                            <dd class="mt-1 text-sm text-gray-900">{{ $identity->email }}</dd>
-                        </div>
-                        <div>
-                            <dt class="text-sm font-medium text-gray-500">Phone Number</dt>
-                            <dd class="mt-1 text-sm text-gray-900">{{ $identity->phone_number ?? 'N/A' }}</dd>
-                        </div>
-                    </dl>
-                </div>
-
-                <div>
-                    <h3 class="text-lg font-semibold text-gray-900 mb-4">Address</h3>
-                    <dl class="grid grid-cols-1 gap-x-4 gap-y-6">
-                        <div>
-                            <dt class="text-sm font-medium text-gray-500">Address</dt>
-                            <dd class="mt-1 text-sm text-gray-900">{{ $identity->address1 }}</dd>
-                        </div>
-                        <div>
-                            <dt class="text-sm font-medium text-gray-500">City</dt>
-                            <dd class="mt-1 text-sm text-gray-900">{{ $identity->city }}</dd>
-                        </div>
-                        <div>
-                            <dt class="text-sm font-medium text-gray-500">Province/State</dt>
-                            <dd class="mt-1 text-sm text-gray-900">{{ $identity->province ?? 'N/A' }}</dd>
-                        </div>
-                        <div>
-                            <dt class="text-sm font-medium text-gray-500">Zip Code</dt>
-                            <dd class="mt-1 text-sm text-gray-900">{{ $identity->zip_code ?? 'N/A' }}</dd>
-                        </div>
-                        <div>
-                            <dt class="text-sm font-medium text-gray-500">Country</dt>
-                            <dd class="mt-1 text-sm text-gray-900">{{ $identity->address_country }}</dd>
-                        </div>
-                    </dl>
                 </div>
             </div>
         @endif
 
-        <div class="mt-6 pt-6 border-t border-gray-200">
-            <h3 class="text-lg font-semibold text-gray-900 mb-4">Verification Status</h3>
-            <dl class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                    <dt class="text-sm font-medium text-gray-500">ID Verification Status</dt>
-                    <dd class="mt-1">
-                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full {{ $identity->id_verification_status === 'APPROVED' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800' }}">
-                            {{ $identity->id_verification_status }}
-                        </span>
-                    </dd>
+        @if (! empty($identity->institution_details['business_description']))
+            <div class="card shadow-sm border-0 rounded-4 mb-4">
+                <div class="card-body p-4 p-md-5">
+                    <h5 class="fw-semibold mb-3">Business description</h5>
+                    <p class="mb-0 text-muted">{{ $identity->institution_details['business_description'] }}</p>
                 </div>
-                <div>
-                    <dt class="text-sm font-medium text-gray-500">Sanctions Verification Status</dt>
-                    <dd class="mt-1">
-                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full {{ $identity->sanctions_verification_status === 'APPROVED' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800' }}">
-                            {{ $identity->sanctions_verification_status }}
-                        </span>
-                    </dd>
+            </div>
+        @endif
+    @else
+        <div class="card shadow-sm border-0 rounded-4 mb-4">
+            <div class="card-body p-4 p-md-5">
+                <h5 class="fw-semibold mb-3">Personal and address details</h5>
+                <div class="table-responsive">
+                    <table class="table align-middle mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Field</th>
+                                <th>Value</th>
+                                <th>Field</th>
+                                <th>Value</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="text-muted">First name</td>
+                                <td class="fw-semibold">{{ $identity->first_name }}</td>
+                                <td class="text-muted">Last name</td>
+                                <td class="fw-semibold">{{ $identity->last_name }}</td>
+                            </tr>
+                            <tr>
+                                <td class="text-muted">Date of birth</td>
+                                <td>{{ $identity->date_of_birth ? $identity->date_of_birth->format('Y-m-d') : 'N/A' }}</td>
+                                <td class="text-muted">Nationality</td>
+                                <td>{{ $identity->nationality }}</td>
+                            </tr>
+                            <tr>
+                                <td class="text-muted">Phone</td>
+                                <td>{{ $identity->phone_number ?? 'N/A' }}</td>
+                                <td class="text-muted">Country</td>
+                                <td>{{ $identity->address_country }}</td>
+                            </tr>
+                            <tr>
+                                <td class="text-muted">Street</td>
+                                <td>{{ $identity->address1 }}</td>
+                                <td class="text-muted">City</td>
+                                <td>{{ $identity->city }}</td>
+                            </tr>
+                            <tr>
+                                <td class="text-muted">Province / state</td>
+                                <td>{{ $identity->province ?? 'N/A' }}</td>
+                                <td class="text-muted">Zip</td>
+                                <td>{{ $identity->zip_code ?? 'N/A' }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
-                <div>
-                    <dt class="text-sm font-medium text-gray-500">Paxos Identity ID</dt>
-                    <dd class="mt-1 text-sm text-gray-900">{{ $identity->paxos_identity_id ?? 'N/A' }}</dd>
-                </div>
-                <div>
-                    <dt class="text-sm font-medium text-gray-500">Reference ID</dt>
-                    <dd class="mt-1 text-sm text-gray-900">{{ $identity->ref_id }}</dd>
-                </div>
-            </dl>
-        </div>
-
-        @if($identity->documents && $identity->documents->count() > 0)
-        <div class="mt-6 pt-6 border-t border-gray-200">
-            <h3 class="text-lg font-semibold text-gray-900 mb-4">Uploaded Documents</h3>
-            <div class="overflow-x-auto">
-                <table class="min-w-full divide-y divide-gray-200">
-                    <thead class="bg-gray-50">
-                        <tr>
-                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Document Type</th>
-                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">File Name</th>
-                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Upload Date</th>
-                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Paxos Document ID</th>
-                        </tr>
-                    </thead>
-                    <tbody class="bg-white divide-y divide-gray-200">
-                        @foreach($identity->documents as $document)
-                        <tr>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                {{ ucfirst(str_replace('_', ' ', $document->document_type)) }}
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                {{ $document->file_name }}
-                                <span class="text-xs text-gray-500 ml-2">({{ number_format($document->file_size / 1024, 2) }} KB)</span>
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                @if($document->upload_status === 'uploaded')
-                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
-                                        Uploaded
-                                    </span>
-                                @elseif($document->upload_status === 'failed')
-                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">
-                                        Failed
-                                    </span>
-                                    @if($document->error_message)
-                                        <div class="text-xs text-red-600 mt-1">{{ Str::limit($document->error_message, 50) }}</div>
-                                    @endif
-                                @else
-                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">
-                                        Pending
-                                    </span>
-                                @endif
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                @if($document->uploaded_at)
-                                    {{ $document->uploaded_at->format('Y-m-d H:i:s') }}
-                                @else
-                                    <span class="text-gray-400">Not uploaded</span>
-                                @endif
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                {{ $document->paxos_document_id ?? 'N/A' }}
-                            </td>
-                        </tr>
-                        @endforeach
-                    </tbody>
-                </table>
             </div>
         </div>
-        @else
-        <div class="mt-6 pt-6 border-t border-gray-200">
-            <h3 class="text-lg font-semibold text-gray-900 mb-4">Uploaded Documents</h3>
-            <p class="text-sm text-gray-500">No documents have been uploaded for this identity yet.</p>
+    @endif
+
+    <div class="card shadow-sm border-0 rounded-4">
+        <div class="card-body p-4 p-md-5">
+            <h5 class="fw-semibold mb-3">Uploaded documents</h5>
+            @if ($identity->documents && $identity->documents->count() > 0)
+                <div class="table-responsive rounded-3 border">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th class="text-uppercase fs-2 text-muted fw-semibold">Type</th>
+                                <th class="text-uppercase fs-2 text-muted fw-semibold">File</th>
+                                <th class="text-uppercase fs-2 text-muted fw-semibold">Status</th>
+                                <th class="text-uppercase fs-2 text-muted fw-semibold">Uploaded</th>
+                                <th class="text-uppercase fs-2 text-muted fw-semibold">Paxos ID</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach ($identity->documents as $document)
+                                <tr>
+                                    <td>{{ ucfirst(str_replace('_', ' ', $document->document_type)) }}</td>
+                                    <td>
+                                        {{ $document->file_name }}
+                                        <span class="text-muted fs-2">({{ number_format($document->file_size / 1024, 2) }} KB)</span>
+                                    </td>
+                                    <td>
+                                        @if ($document->upload_status === 'uploaded')
+                                            <span class="badge rounded-pill text-bg-success">Uploaded</span>
+                                        @elseif ($document->upload_status === 'failed')
+                                            <span class="badge rounded-pill text-bg-danger">Failed</span>
+                                            @if ($document->error_message)
+                                                <div class="text-danger small mt-1">{{ \Illuminate\Support\Str::limit($document->error_message, 50) }}</div>
+                                            @endif
+                                        @else
+                                            <span class="badge rounded-pill text-bg-warning">Pending</span>
+                                        @endif
+                                    </td>
+                                    <td class="text-muted small">{{ $document->uploaded_at ? $document->uploaded_at->format('Y-m-d H:i:s') : '—' }}</td>
+                                    <td class="font-monospace small text-muted">{{ $document->paxos_document_id ?? 'N/A' }}</td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+            @else
+                <p class="text-muted mb-0">No documents have been uploaded for this identity yet.</p>
+            @endif
         </div>
-        @endif
     </div>
-</div>
+
+    @if ($identity->id_verification_status === 'PENDING' || $identity->sanctions_verification_status === 'PENDING')
+        <x-status-poll
+            mode="identity"
+            reload-on-change
+            :url="route('lender.status.identity', $identity)"
+            :snapshot="['id' => $identity->id_verification_status, 's' => $identity->sanctions_verification_status]"
+            :interval="15000"
+        />
+    @endif
 @endsection

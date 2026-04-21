@@ -27,4 +27,19 @@ class Profile extends Model
     {
         return $this->hasMany(FiatDepositInstruction::class);
     }
+
+    public function depositAddresses()
+    {
+        return $this->hasMany(DepositAddress::class);
+    }
+
+    public function fiatWithdrawals()
+    {
+        return $this->hasMany(FiatWithdrawal::class);
+    }
+
+    public function cryptoWithdrawals()
+    {
+        return $this->hasMany(CryptoWithdrawal::class);
+    }
 }

@@ -1,175 +1,189 @@
 @extends('layouts.app')
 
-@section('title', 'Profile Details')
+@section('title', 'Profile details')
+
+@section('page_actions')
+    <a href="{{ route('lender.profiles.fiat-deposit-instructions.create', $profile) }}" class="btn btn-primary rounded-3">
+        <i class="ti ti-building-bank me-1"></i> Fiat deposit
+    </a>
+    <a href="{{ route('lender.profiles.deposit-addresses.create', $profile) }}" class="btn btn-outline-primary rounded-3">
+        <i class="ti ti-qrcode me-1"></i> Crypto address
+    </a>
+    <a href="{{ route('lender.fiat-withdrawals.create') }}" class="btn btn-outline-primary rounded-3">
+        <i class="ti ti-arrow-up-right me-1"></i> Fiat withdrawal
+    </a>
+    <a href="{{ route('lender.profiles.crypto-withdrawals.create', $profile) }}" class="btn btn-outline-primary rounded-3">
+        <i class="ti ti-currency-bitcoin me-1"></i> Crypto withdrawal
+    </a>
+    <a href="{{ route('lender.profiles.index') }}" class="btn btn-outline-secondary rounded-3">Back</a>
+@endsection
 
 @section('content')
-<div class="py-6">
-    <div class="flex justify-between items-center mb-6">
-        <h1 class="text-3xl font-bold text-gray-900">Profile Details</h1>
-        <div class="flex gap-4">
-            <a href="{{ route('lender.profiles.fiat-deposit-instructions.create', $profile) }}" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded">
-                Create Fiat Deposit Instruction
-            </a>
-            <a href="{{ route('lender.profiles.index') }}" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded">
-                Back
-            </a>
+    <div class="row g-4 mb-4">
+        <div class="col-md-4">
+            <div class="card shadow-sm border-0 rounded-4 h-100">
+                <div class="card-body p-4">
+                    <p class="fs-2 text-muted mb-1">Paxos profile ID</p>
+                    <p class="mb-0 fw-semibold font-monospace text-break">{{ $profile->paxos_profile_id ?? 'N/A' }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card shadow-sm border-0 rounded-4 h-100">
+                <div class="card-body p-4">
+                    <p class="fs-2 text-muted mb-1">Account</p>
+                    <p class="mb-0 fw-semibold">{{ $profile->account->type }}</p>
+                    <p class="mb-0 mt-1 fs-3 text-muted">{{ $profile->account->description ?? 'No description' }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card shadow-sm border-0 rounded-4 h-100">
+                <div class="card-body p-4">
+                    <p class="fs-2 text-muted mb-1">Identity</p>
+                    <p class="mb-0 fw-semibold">{{ $profile->account->identity->first_name }} {{ $profile->account->identity->last_name }}</p>
+                    <p class="mb-0 mt-1 fs-3 text-muted text-break">{{ $profile->account->identity->email }}</p>
+                </div>
+            </div>
         </div>
     </div>
 
-    <div class="bg-white shadow rounded-lg p-6">
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div>
-                <h3 class="text-lg font-semibold text-gray-900 mb-4">Profile Information</h3>
-                <dl class="grid grid-cols-1 gap-x-4 gap-y-6">
-                    <div>
-                        <dt class="text-sm font-medium text-gray-500">Paxos Profile ID</dt>
-                        <dd class="mt-1 text-sm text-gray-900">{{ $profile->paxos_profile_id ?? 'N/A' }}</dd>
-                    </div>
-                </dl>
+    <div class="card shadow-sm border-0 rounded-4 mb-4">
+        <div class="card-body p-4 p-md-5">
+            <div class="d-flex align-items-center justify-content-between gap-2 mb-3">
+                <h5 class="fw-semibold mb-0">Profile links</h5>
+                <a href="{{ route('lender.accounts.show', $profile->account) }}" class="btn btn-sm btn-outline-primary rounded-3">View account</a>
             </div>
-
-            <div>
-                <h3 class="text-lg font-semibold text-gray-900 mb-4">Account Information</h3>
-                <dl class="grid grid-cols-1 gap-x-4 gap-y-6">
-                    <div>
-                        <dt class="text-sm font-medium text-gray-500">Account Type</dt>
-                        <dd class="mt-1 text-sm text-gray-900">{{ $profile->account->type }}</dd>
-                    </div>
-                    <div>
-                        <dt class="text-sm font-medium text-gray-500">Account Description</dt>
-                        <dd class="mt-1 text-sm text-gray-900">{{ $profile->account->description ?? 'N/A' }}</dd>
-                    </div>
-                    <div>
-                        <a href="{{ route('lender.accounts.show', $profile->account) }}" class="text-indigo-600 hover:text-indigo-500">
-                            View Account Details →
-                        </a>
-                    </div>
-                </dl>
-            </div>
+            <p class="mb-0 text-muted">This profile is used for all institution transfer flows. Use the action buttons above to issue instructions and initiate transfers.</p>
         </div>
+    </div>
 
-        <div class="mt-6 pt-6 border-t border-gray-200">
-            <h3 class="text-lg font-semibold text-gray-900 mb-4">Identity Information</h3>
-            <dl class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                    <dt class="text-sm font-medium text-gray-500">Name</dt>
-                    <dd class="mt-1 text-sm text-gray-900">{{ $profile->account->identity->first_name }} {{ $profile->account->identity->last_name }}</dd>
+    @if ($profile->depositAddresses && $profile->depositAddresses->count() > 0)
+        <div class="card shadow-sm border-0 rounded-4 mb-4">
+            <div class="card-body p-4 p-md-5">
+                <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-3">
+                    <h5 class="fw-semibold mb-0">Crypto deposit addresses</h5>
+                    <a href="{{ route('lender.deposit-addresses.index') }}" class="btn btn-sm btn-outline-primary rounded-3">View all</a>
                 </div>
-                <div>
-                    <dt class="text-sm font-medium text-gray-500">Email</dt>
-                    <dd class="mt-1 text-sm text-gray-900">{{ $profile->account->identity->email }}</dd>
+                <div class="table-responsive">
+                    <table class="table align-middle mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Network</th>
+                                <th>Address</th>
+                                <th>Conversion target</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach ($profile->depositAddresses as $addr)
+                                <tr>
+                                    <td class="fw-semibold text-primary">{{ $addr->crypto_network }}</td>
+                                    <td class="font-monospace small text-break">{{ $addr->address }}</td>
+                                    <td>{{ $addr->conversion_target_asset ?? 'None' }}</td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
                 </div>
-            </dl>
-        </div>
-
-        @if($profile->fiatDepositInstructions && $profile->fiatDepositInstructions->count() > 0)
-        <div class="mt-6 pt-6 border-t border-gray-200">
-            <div class="flex justify-between items-center mb-4">
-                <h3 class="text-lg font-semibold text-gray-900">Fiat Deposit Instructions</h3>
-                <a href="{{ route('lender.fiat-deposit-instructions.index') }}" class="text-sm text-indigo-600 hover:text-indigo-500">
-                    View All →
-                </a>
             </div>
-            <ul class="divide-y divide-gray-200">
-                @foreach($profile->fiatDepositInstructions as $instruction)
-                <li class="py-3">
-                    <a href="{{ route('lender.fiat-deposit-instructions.show', $instruction) }}" class="block hover:bg-gray-50 -mx-4 px-4 py-2 rounded">
-                        <div class="flex items-center justify-between">
-                            <div>
-                                <p class="text-sm font-medium text-indigo-600">
-                                    {{ $instruction->fiat_network }} Deposit Instruction
-                                </p>
-                                @if($instruction->memo_id)
-                                <p class="text-xs text-gray-500 mt-1">Memo ID: <span class="font-mono">{{ $instruction->memo_id }}</span></p>
-                                @endif
-                            </div>
-                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
-                                {{ $instruction->status === 'VALID' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800' }}">
-                                {{ $instruction->status ?? 'N/A' }}
-                            </span>
-                        </div>
-                    </a>
-                </li>
-                @endforeach
-            </ul>
         </div>
-        @endif
+    @endif
 
-        <div class="mt-6 pt-6 border-t border-gray-200">
-            <h3 class="text-lg font-semibold text-gray-900 mb-4">Transfers</h3>
-            
-            @if(isset($transfersError))
-            <div class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded mb-4">
-                {{ $transfersError }}
-            </div>
-            @endif
-
-            @if(isset($transfers) && count($transfers) > 0)
-            <div class="bg-white shadow overflow-hidden sm:rounded-md">
-                <ul class="divide-y divide-gray-200">
-                    @foreach($transfers as $transfer)
-                    <li>
-                        @if(isset($transfer['id']) && !empty($transfer['id']))
-                        <a href="{{ route('lender.fiat-deposits.show', $transfer['id']) }}" class="block hover:bg-gray-50">
-                        @else
-                        <div class="block">
-                        @endif
-                            <div class="px-4 py-4 sm:px-6">
-                                <div class="flex items-center justify-between">
-                                    <div class="flex items-center">
-                                        <p class="text-sm font-medium text-indigo-600 truncate">
-                                            {{ $transfer['asset'] ?? 'USD' }} {{ number_format($transfer['amount'] ?? 0, 2) }} 
-                                            {{ isset($transfer['type']) && (str_contains($transfer['type'], 'DEPOSIT') || $transfer['type'] === 'DEPOSIT') ? 'Deposit' : 'Transfer' }}
-                                        </p>
-                                    </div>
-                                    <div class="ml-2 flex-shrink-0 flex">
-                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
-                                            {{ ($transfer['status'] ?? 'PENDING') === 'COMPLETED' ? 'bg-green-100 text-green-800' : (($transfer['status'] ?? 'PENDING') === 'PENDING' ? 'bg-yellow-100 text-yellow-800' : 'bg-gray-100 text-gray-800') }}">
-                                            {{ $transfer['status'] ?? 'PENDING' }}
+    @if ($profile->fiatDepositInstructions && $profile->fiatDepositInstructions->count() > 0)
+        <div class="card shadow-sm border-0 rounded-4 mb-4">
+            <div class="card-body p-4 p-md-5">
+                <h5 class="fw-semibold mb-3">Fiat deposit instructions</h5>
+                <div class="table-responsive">
+                    <table class="table align-middle mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Network</th>
+                                <th>Memo ID</th>
+                                <th>Reference</th>
+                                <th>Status</th>
+                                <th class="text-end">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach ($profile->fiatDepositInstructions as $instruction)
+                                <tr>
+                                    <td class="fw-semibold text-primary">{{ $instruction->fiat_network }}</td>
+                                    <td class="font-monospace">{{ $instruction->memo_id ?? 'N/A' }}</td>
+                                    <td class="font-monospace">{{ $instruction->ref_id ?? 'N/A' }}</td>
+                                    <td>
+                                        <span class="badge rounded-pill {{ ($instruction->status ?? '') === 'VALID' ? 'text-bg-success' : 'text-bg-warning' }}">
+                                            {{ $instruction->status ?? 'N/A' }}
                                         </span>
-                                    </div>
-                                </div>
-                                <div class="mt-2 sm:flex sm:justify-between">
-                                    <div class="sm:flex">
-                                        <p class="flex items-center text-sm text-gray-500">
-                                            Type: {{ $transfer['type'] ?? 'N/A' }}
-                                        </p>
-                                        @if(isset($transfer['memo']) || isset($transfer['memo_id']))
-                                        <p class="mt-2 flex items-center text-sm text-gray-500 sm:mt-0 sm:ml-6">
-                                            Memo: <span class="font-mono ml-1">{{ $transfer['memo'] ?? $transfer['memo_id'] ?? 'N/A' }}</span>
-                                        </p>
-                                        @endif
-                                        @if(isset($transfer['id']))
-                                        <p class="mt-2 flex items-center text-sm text-gray-500 sm:mt-0 sm:ml-6">
-                                            ID: <span class="font-mono ml-1 text-xs">{{ substr($transfer['id'], 0, 8) }}...</span>
-                                        </p>
-                                        @endif
-                                    </div>
-                                    <div class="mt-2 flex items-center text-sm text-gray-500 sm:mt-0">
-                                        @if(isset($transfer['created_at']))
-                                        <p>
-                                            Created {{ \Carbon\Carbon::parse($transfer['created_at'])->diffForHumans() }}
-                                        </p>
-                                        @endif
-                                    </div>
-                                </div>
-                            </div>
-                        @if(isset($transfer['id']) && !empty($transfer['id']))
-                        </a>
-                        @else
-                        </div>
-                        @endif
-                    </li>
-                    @endforeach
-                </ul>
+                                    </td>
+                                    <td class="text-end">
+                                        <a href="{{ route('lender.fiat-deposit-instructions.show', $instruction) }}" class="btn btn-sm btn-outline-primary rounded-3">View</a>
+                                    </td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
             </div>
+        </div>
+    @endif
+
+    <div class="card shadow-sm border-0 rounded-4">
+        <div class="card-body p-4 p-md-5">
+            <h5 class="fw-semibold mb-3">Transfers</h5>
+
+            @if (isset($transfersError))
+                <div class="alert alert-danger border-0 rounded-3">{{ $transfersError }}</div>
+            @endif
+
+            @if (isset($transfers) && count($transfers) > 0)
+                <div class="table-responsive">
+                    <table class="table align-middle mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Transfer ID</th>
+                                <th>Type</th>
+                                <th>Asset</th>
+                                <th>Amount</th>
+                                <th>Status</th>
+                                <th>Memo/Ref</th>
+                                <th>Created</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach ($transfers as $transfer)
+                                @php
+                                    $status = (string) ($transfer['status'] ?? 'PENDING');
+                                    $memoOrRef = $transfer['memo'] ?? $transfer['memo_id'] ?? $transfer['ref_id'] ?? 'N/A';
+                                @endphp
+                                <tr>
+                                    <td class="font-monospace small">{{ $transfer['id'] ?? 'N/A' }}</td>
+                                    <td>{{ $transfer['type'] ?? 'N/A' }}</td>
+                                    <td>{{ $transfer['asset'] ?? 'N/A' }}</td>
+                                    <td>{{ number_format((float) ($transfer['amount'] ?? 0), 2) }}</td>
+                                    <td>
+                                        <span class="badge rounded-pill {{ $status === 'COMPLETED' ? 'text-bg-success' : ($status === 'PENDING' ? 'text-bg-warning' : 'text-bg-secondary') }}">
+                                            {{ $status }}
+                                        </span>
+                                    </td>
+                                    <td class="font-monospace small">{{ $memoOrRef }}</td>
+                                    <td class="text-muted">
+                                        @if (isset($transfer['created_at']))
+                                            {{ \Carbon\Carbon::parse($transfer['created_at'])->diffForHumans() }}
+                                        @else
+                                            N/A
+                                        @endif
+                                    </td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
             @else
-            <div class="bg-gray-50 rounded-lg p-8 text-center">
-                <p class="text-gray-500">No transfers found for this profile.</p>
-                <p class="text-sm text-gray-400 mt-2">Transfers will appear here after you initiate a deposit.</p>
-            </div>
+                <div class="text-center py-5 rounded-3 bg-body-secondary">
+                    <p class="text-muted mb-1">No transfers found for this profile.</p>
+                    <p class="fs-3 text-muted mb-0">Transfers appear here after profile activity is initiated.</p>
+                </div>
             @endif
         </div>
     </div>
-</div>
 @endsection

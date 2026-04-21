@@ -22,3 +22,7 @@
 Homestead.json
 Homestead.yaml
 Thumbs.db
+dist.zip
+
+# Modernize template assets
+/public/modernize/

@@ -1,62 +1,62 @@
 @extends('layouts.app')
 
-@section('title', 'Fiat Accounts')
+@section('title', 'Fiat accounts')
+
+@section('page_actions')
+    <a href="{{ route('lender.fiat-accounts.create') }}" class="btn btn-primary rounded-3">
+        <i class="ti ti-plus me-1"></i> Create fiat account
+    </a>
+@endsection
 
 @section('content')
-<div class="py-6">
-    <div class="flex justify-between items-center mb-6">
-        <h1 class="text-3xl font-bold text-gray-900">Fiat Accounts</h1>
-        <a href="{{ route('lender.fiat-accounts.create') }}" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded">
-            Create Fiat Account
-        </a>
-    </div>
-
-    <div class="bg-white shadow overflow-hidden sm:rounded-md">
-        <ul class="divide-y divide-gray-200">
-            @forelse($fiatAccounts as $fiatAccount)
-            <li>
-                <a href="{{ route('lender.fiat-accounts.show', $fiatAccount) }}" class="block hover:bg-gray-50">
-                    <div class="px-4 py-4 sm:px-6">
-                        <div class="flex items-center justify-between">
-                            <div class="flex items-center">
-                                <p class="text-sm font-medium text-indigo-600 truncate">
-                                    Fiat Account
-                                </p>
-                            </div>
-                            <div class="ml-2 flex-shrink-0 flex">
-                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
-                                    {{ $fiatAccount->status === 'APPROVED' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800' }}">
+    <div class="card shadow-sm border-0 rounded-4 overflow-hidden">
+        <div class="table-responsive">
+            <table class="table align-middle mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>Account</th>
+                        <th>Identity</th>
+                        <th>Owner</th>
+                        <th>Status</th>
+                        <th>Created</th>
+                        <th class="text-end">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @forelse ($fiatAccounts as $fiatAccount)
+                        <tr>
+                            <td class="fw-semibold text-primary font-monospace small">{{ $fiatAccount->paxos_fiat_account_id }}</td>
+                            <td>{{ $fiatAccount->identity->first_name }} {{ $fiatAccount->identity->last_name }}</td>
+                            <td>
+                                @if ($fiatAccount->fiat_account_owner && isset($fiatAccount->fiat_account_owner['person_details']))
+                                    {{ $fiatAccount->fiat_account_owner['person_details']['first_name'] ?? '' }}
+                                    {{ $fiatAccount->fiat_account_owner['person_details']['last_name'] ?? '' }}
+                                @elseif ($fiatAccount->fiat_account_owner && isset($fiatAccount->fiat_account_owner['institution_details']))
+                                    {{ $fiatAccount->fiat_account_owner['institution_details']['name'] ?? 'N/A' }}
+                                @else
+                                    N/A
+                                @endif
+                            </td>
+                            <td>
+                                <span class="badge rounded-pill {{ $fiatAccount->status === 'APPROVED' ? 'text-bg-success' : 'text-bg-warning' }}">
                                     {{ $fiatAccount->status }}
                                 </span>
-                            </div>
-                        </div>
-                        <div class="mt-2 sm:flex sm:justify-between">
-                            <div class="sm:flex">
-                                <p class="flex items-center text-sm text-gray-500">
-                                    {{ $fiatAccount->identity->first_name }} {{ $fiatAccount->identity->last_name }}
-                                </p>
-                                @if($fiatAccount->fiat_account_owner && isset($fiatAccount->fiat_account_owner['person_details']))
-                                <p class="mt-2 flex items-center text-sm text-gray-500 sm:mt-0 sm:ml-6">
-                                    {{ $fiatAccount->fiat_account_owner['person_details']['first_name'] ?? '' }} 
-                                    {{ $fiatAccount->fiat_account_owner['person_details']['last_name'] ?? '' }}
-                                </p>
-                                @endif
-                            </div>
-                            <div class="mt-2 flex items-center text-sm text-gray-500 sm:mt-0">
-                                <p>
-                                    Created {{ $fiatAccount->created_at->diffForHumans() }}
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-                </a>
-            </li>
-            @empty
-            <li class="px-4 py-8 text-center text-gray-500">
-                No fiat accounts found. <a href="{{ route('lender.fiat-accounts.create') }}" class="text-indigo-600 hover:text-indigo-500">Create one</a>
-            </li>
-            @endforelse
-        </ul>
+                            </td>
+                            <td class="text-muted">{{ $fiatAccount->created_at->diffForHumans() }}</td>
+                            <td class="text-end">
+                                <a href="{{ route('lender.fiat-accounts.show', $fiatAccount) }}" class="btn btn-sm btn-outline-primary rounded-3">View</a>
+                            </td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="6" class="text-center text-muted py-5">
+                                No fiat accounts found.
+                                <a href="{{ route('lender.fiat-accounts.create') }}" class="fw-semibold">Create one</a>
+                            </td>
+                        </tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
     </div>
-</div>
 @endsection

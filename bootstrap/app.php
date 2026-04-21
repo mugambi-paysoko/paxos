@@ -12,7 +12,9 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
-        //
+        $middleware->validateCsrfTokens(except: [
+            'webhooks/paxos',
+        ]);
     })
     ->withSchedule(function (Schedule $schedule): void {
         // Poll Paxos events every 5 minutes

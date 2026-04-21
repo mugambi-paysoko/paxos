@@ -77,19 +77,54 @@ class User extends Authenticatable
         return $this->hasMany(FiatDeposit::class);
     }
 
+    public function fiatWithdrawals()
+    {
+        return $this->hasMany(FiatWithdrawal::class);
+    }
+
+    public function cryptoWithdrawals()
+    {
+        return $this->hasMany(CryptoWithdrawal::class);
+    }
+
+    public function depositAddresses()
+    {
+        return $this->hasMany(DepositAddress::class);
+    }
+
     public function isLender(): bool
     {
-        return $this->role === 'lender';
+        return $this->isInstitution();
     }
 
     public function isBorrower(): bool
     {
-        return $this->role === 'borrower';
+        return $this->isIndividual();
+    }
+
+    public function isInstitution(): bool
+    {
+        return in_array($this->role, ['institution', 'lender'], true);
+    }
+
+    public function isIndividual(): bool
+    {
+        return in_array($this->role, ['individual', 'borrower'], true);
     }
 
     public function isAdmin(): bool
     {
         return $this->role === 'admin';
+    }
+
+    public function roleLabel(): string
+    {
+        return match ($this->role) {
+            'institution', 'lender' => 'Institution',
+            'individual', 'borrower' => 'Individual',
+            'admin' => 'Admin',
+            default => ucfirst((string) $this->role),
+        };
     }
 
     /**
@@ -109,7 +144,7 @@ class User extends Authenticatable
             ->whereNotNull('paxos_identity_id')
             ->where('id_verification_status', 'APPROVED')
             ->where('sanctions_verification_status', 'APPROVED')
-            ->first() 
+            ->first()
             ?? $this->identities()->whereNotNull('paxos_identity_id')->first();
     }
 }

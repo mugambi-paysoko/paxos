@@ -1,58 +1,53 @@
-@extends('layouts.app')
+@extends('layouts.borrower')
 
 @section('title', 'Identities')
 
-@section('content')
-<div class="py-6">
-    <div class="flex justify-between items-center mb-6">
-        <h1 class="text-3xl font-bold text-gray-900">Identities</h1>
-        <a href="{{ route('borrower.identities.create') }}" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded">
-            Create Identity
-        </a>
-    </div>
+@section('page_actions')
+    <a href="{{ route('borrower.identities.create') }}" class="btn btn-primary rounded-3">
+        <i class="ti ti-plus me-1"></i> Create identity
+    </a>
+@endsection
 
-    <div class="bg-white shadow overflow-hidden sm:rounded-md">
-        <ul class="divide-y divide-gray-200">
-            @forelse($identities as $identity)
-            <li>
-                <a href="{{ route('borrower.identities.show', $identity) }}" class="block hover:bg-gray-50">
-                    <div class="px-4 py-4 sm:px-6">
-                        <div class="flex items-center justify-between">
-                            <div class="flex items-center">
-                                <p class="text-sm font-medium text-indigo-600 truncate">
-                                    {{ $identity->first_name }} {{ $identity->last_name }}
-                                </p>
-                            </div>
-                            <div class="ml-2 flex-shrink-0 flex">
-                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full {{ $identity->id_verification_status === 'APPROVED' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800' }}">
+@section('content')
+    <div class="card shadow-sm border-0 rounded-4 overflow-hidden">
+        <div class="table-responsive">
+            <table class="table align-middle mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Nationality</th>
+                        <th>Status</th>
+                        <th>Created</th>
+                        <th class="text-end">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @forelse ($identities as $identity)
+                        <tr>
+                            <td class="fw-semibold text-primary">{{ $identity->first_name }} {{ $identity->last_name }}</td>
+                            <td>{{ $identity->email }}</td>
+                            <td>{{ $identity->nationality }}</td>
+                            <td>
+                                <span class="badge rounded-pill {{ $identity->id_verification_status === 'APPROVED' ? 'text-bg-success' : 'text-bg-warning' }}">
                                     {{ $identity->id_verification_status }}
                                 </span>
-                            </div>
-                        </div>
-                        <div class="mt-2 sm:flex sm:justify-between">
-                            <div class="sm:flex">
-                                <p class="flex items-center text-sm text-gray-500">
-                                    {{ $identity->email }}
-                                </p>
-                                <p class="mt-2 flex items-center text-sm text-gray-500 sm:mt-0 sm:ml-6">
-                                    {{ $identity->nationality }}
-                                </p>
-                            </div>
-                            <div class="mt-2 flex items-center text-sm text-gray-500 sm:mt-0">
-                                <p>
-                                    Created {{ $identity->created_at->diffForHumans() }}
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-                </a>
-            </li>
-            @empty
-            <li class="px-4 py-8 text-center text-gray-500">
-                No identities found. <a href="{{ route('borrower.identities.create') }}" class="text-indigo-600 hover:text-indigo-500">Create one</a>
-            </li>
-            @endforelse
-        </ul>
+                            </td>
+                            <td class="text-muted">{{ $identity->created_at->diffForHumans() }}</td>
+                            <td class="text-end">
+                                <a href="{{ route('borrower.identities.show', $identity) }}" class="btn btn-sm btn-outline-primary rounded-3">View</a>
+                            </td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="6" class="text-center text-muted py-5">
+                                No identities found.
+                                <a href="{{ route('borrower.identities.create') }}" class="fw-semibold">Create one</a>
+                            </td>
+                        </tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
     </div>
-</div>
 @endsection

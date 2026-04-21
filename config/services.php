@@ -40,7 +40,12 @@ return [
         'api_token' => env('PAXOS_API_TOKEN'),
         'client_id' => env('PAXOS_CLIENT_ID'),
         'client_secret' => env('PAXOS_CLIENT_SECRET'),
-        'scope' => env('PAXOS_SCOPE', 'identity:write_identity identity:read_identity identity:write_account identity:read_account'),
+        'scope' => env('PAXOS_SCOPE', 'identity:write_identity identity:read_identity identity:write_account identity:read_account funding:read_profile'),
+        // When true, omit identity_id/account_id on deposit-address (and similar) calls — required for first-party; third-party sets false.
+        'first_party' => env('PAXOS_FIRST_PARTY', true),
+        // Inbound webhooks: Paxos sends this header with the value you configure in Dashboard (API Key auth).
+        'webhook_header' => env('PAXOS_WEBHOOK_HEADER', 'X-Paxos-Webhook-Key'),
+        'webhook_secret' => env('PAXOS_WEBHOOK_SECRET'),
     ],
 
 ];

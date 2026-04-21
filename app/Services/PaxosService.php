@@ -424,6 +424,270 @@ class PaxosService
     }
 
     /**
+     * Create fiat withdrawal.
+     *
+     * @param  array<string, mixed>  $data
+     * @return array<string, mixed>
+     *
+     * @throws \Exception
+     */
+    public function createFiatWithdrawal(array $data): array
+    {
+        $this->ensureAuthenticated();
+
+        $requestBody = [
+            'asset' => $data['asset'] ?? 'USD',
+            'fiat_account_id' => $data['fiat_account_id'] ?? null,
+            'profile_id' => $data['profile_id'] ?? null,
+        ];
+
+        if (! empty($data['ref_id'])) {
+            $requestBody['ref_id'] = $data['ref_id'];
+        }
+        if (! empty($data['amount'])) {
+            $requestBody['amount'] = $data['amount'];
+        }
+        if (! empty($data['total'])) {
+            $requestBody['total'] = $data['total'];
+        }
+        if (! empty($data['memo'])) {
+            $requestBody['memo'] = $data['memo'];
+        }
+        if (! empty($data['metadata']) && is_array($data['metadata'])) {
+            $requestBody['metadata'] = $data['metadata'];
+        }
+        if (! empty($data['identity_id'])) {
+            $requestBody['identity_id'] = $data['identity_id'];
+        }
+        if (! empty($data['account_id'])) {
+            $requestBody['account_id'] = $data['account_id'];
+        }
+
+        if (empty($requestBody['fiat_account_id']) || empty($requestBody['profile_id'])) {
+            throw new \Exception('fiat_account_id and profile_id are required for fiat withdrawal');
+        }
+        if ((empty($requestBody['amount']) && empty($requestBody['total'])) || (! empty($requestBody['amount']) && ! empty($requestBody['total']))) {
+            throw new \Exception('Specify exactly one of amount or total for fiat withdrawal');
+        }
+
+        $url = "{$this->baseUrl}/v2/transfer/fiat-withdrawals";
+
+        Log::info('Creating fiat withdrawal in Paxos - Request Body', [
+            'url' => $url,
+            'request_body' => $requestBody,
+            'request_body_json' => json_encode($requestBody, JSON_PRETTY_PRINT),
+        ]);
+
+        $response = Http::withHeaders([
+            'Accept' => 'application/json',
+            'Content-Type' => 'application/json',
+            'Authorization' => 'Bearer '.$this->apiToken,
+        ])->post($url, $requestBody);
+
+        if ($response->failed()) {
+            $errorBody = $response->json() ?? $response->body();
+            Log::error('Paxos create fiat withdrawal failed', [
+                'status' => $response->status(),
+                'response' => $errorBody,
+            ]);
+            throw new \Exception('Failed to create fiat withdrawal in Paxos API. Status: '.$response->status().'. Response: '.json_encode($errorBody));
+        }
+
+        $responseData = $response->json();
+
+        Log::info('Paxos create fiat withdrawal response', [
+            'response' => $responseData,
+            'response_json' => json_encode($responseData, JSON_PRETTY_PRINT),
+        ]);
+
+        if (! isset($responseData['id'])) {
+            throw new \Exception('Paxos API returned invalid response: missing transfer id for fiat withdrawal. Response: '.json_encode($responseData));
+        }
+
+        return $responseData;
+    }
+
+    /**
+     * Create crypto withdrawal.
+     *
+     * @param  array<string, mixed>  $data
+     * @return array<string, mixed>
+     *
+     * @throws \Exception
+     */
+    public function createCryptoWithdrawal(array $data): array
+    {
+        $this->ensureAuthenticated();
+
+        $requestBody = [
+            'profile_id' => $data['profile_id'] ?? null,
+            'asset' => $data['asset'] ?? null,
+            'destination_address' => $data['destination_address'] ?? null,
+            'crypto_network' => $data['crypto_network'] ?? null,
+        ];
+
+        if (! empty($data['ref_id'])) {
+            $requestBody['ref_id'] = $data['ref_id'];
+        }
+        if (! empty($data['amount'])) {
+            $requestBody['amount'] = $data['amount'];
+        }
+        if (! empty($data['total'])) {
+            $requestBody['total'] = $data['total'];
+        }
+        if (! empty($data['balance_asset'])) {
+            $requestBody['balance_asset'] = $data['balance_asset'];
+        }
+        if (! empty($data['metadata']) && is_array($data['metadata'])) {
+            $requestBody['metadata'] = $data['metadata'];
+        }
+        if (! empty($data['beneficiary']) && is_array($data['beneficiary'])) {
+            $requestBody['beneficiary'] = $data['beneficiary'];
+        }
+        if (! empty($data['memo'])) {
+            $requestBody['memo'] = $data['memo'];
+        }
+        if (! empty($data['fee_id'])) {
+            $requestBody['fee_id'] = $data['fee_id'];
+        }
+        if (! empty($data['identity_id'])) {
+            $requestBody['identity_id'] = $data['identity_id'];
+        }
+        if (! empty($data['account_id'])) {
+            $requestBody['account_id'] = $data['account_id'];
+        }
+
+        if (
+            empty($requestBody['profile_id']) ||
+            empty($requestBody['asset']) ||
+            empty($requestBody['destination_address']) ||
+            empty($requestBody['crypto_network'])
+        ) {
+            throw new \Exception('profile_id, asset, destination_address and crypto_network are required for crypto withdrawal');
+        }
+
+        if (
+            (empty($requestBody['amount']) && empty($requestBody['total'])) ||
+            (! empty($requestBody['amount']) && ! empty($requestBody['total']))
+        ) {
+            throw new \Exception('Specify exactly one of amount or total for crypto withdrawal');
+        }
+
+        $url = "{$this->baseUrl}/v2/transfer/crypto-withdrawals";
+
+        Log::info('Creating crypto withdrawal in Paxos - Request Body', [
+            'url' => $url,
+            'request_body' => $requestBody,
+            'request_body_json' => json_encode($requestBody, JSON_PRETTY_PRINT),
+        ]);
+
+        $response = Http::withHeaders([
+            'Accept' => 'application/json',
+            'Content-Type' => 'application/json',
+            'Authorization' => 'Bearer '.$this->apiToken,
+        ])->post($url, $requestBody);
+
+        if ($response->failed()) {
+            $errorBody = $response->json() ?? $response->body();
+            Log::error('Paxos create crypto withdrawal failed', [
+                'status' => $response->status(),
+                'response' => $errorBody,
+            ]);
+            throw new \Exception('Failed to create crypto withdrawal in Paxos API. Status: '.$response->status().'. Response: '.json_encode($errorBody));
+        }
+
+        $responseData = $response->json();
+
+        Log::info('Paxos create crypto withdrawal response', [
+            'response' => $responseData,
+            'response_json' => json_encode($responseData, JSON_PRETTY_PRINT),
+        ]);
+
+        if (! isset($responseData['id'])) {
+            throw new \Exception('Paxos API returned invalid response: missing transfer id for crypto withdrawal. Response: '.json_encode($responseData));
+        }
+
+        return $responseData;
+    }
+
+    /**
+     * Create a crypto deposit address for a profile (POST /v2/transfer/deposit-addresses).
+     *
+     * @param  array<string, mixed>  $data
+     * @return array<string, mixed>
+     *
+     * @throws \Exception
+     */
+    public function createDepositAddress(array $data): array
+    {
+        $this->ensureAuthenticated();
+
+        $requestBody = [
+            'profile_id' => $data['profile_id'] ?? null,
+            'crypto_network' => $data['crypto_network'] ?? null,
+        ];
+
+        if (! empty($data['identity_id'])) {
+            $requestBody['identity_id'] = $data['identity_id'];
+        }
+        if (! empty($data['ref_id'])) {
+            $requestBody['ref_id'] = $data['ref_id'];
+        }
+        if (! empty($data['account_id'])) {
+            $requestBody['account_id'] = $data['account_id'];
+        }
+        if (! empty($data['conversion_target_asset'])) {
+            $requestBody['conversion_target_asset'] = $data['conversion_target_asset'];
+        }
+        if (! empty($data['metadata']) && is_array($data['metadata'])) {
+            $requestBody['metadata'] = $data['metadata'];
+        }
+
+        if (empty($requestBody['profile_id']) || empty($requestBody['crypto_network'])) {
+            throw new \Exception('profile_id and crypto_network are required to create a deposit address');
+        }
+
+        $url = "{$this->baseUrl}/v2/transfer/deposit-addresses";
+
+        Log::info('Creating deposit address in Paxos - Request Body', [
+            'url' => $url,
+            'request_body' => $requestBody,
+            'request_body_json' => json_encode($requestBody, JSON_PRETTY_PRINT),
+        ]);
+
+        $response = Http::withHeaders([
+            'Accept' => 'application/json',
+            'Content-Type' => 'application/json',
+            'Authorization' => 'Bearer '.$this->apiToken,
+        ])->post($url, $requestBody);
+
+        if ($response->failed()) {
+            $errorBody = $response->json() ?? $response->body();
+            Log::error('Paxos create deposit address failed', [
+                'status' => $response->status(),
+                'response' => $errorBody,
+            ]);
+            throw new \Exception('Failed to create deposit address in Paxos API. Status: '.$response->status().'. Response: '.json_encode($errorBody));
+        }
+
+        $responseData = $response->json();
+
+        Log::info('Paxos create deposit address response', [
+            'response' => $responseData,
+            'response_json' => json_encode($responseData, JSON_PRETTY_PRINT),
+        ]);
+
+        if (! isset($responseData['id'], $responseData['address'])) {
+            Log::error('Paxos create deposit address returned invalid response', [
+                'response' => $responseData,
+            ]);
+            throw new \Exception('Paxos API returned invalid response: missing deposit address id or address. Response: '.json_encode($responseData));
+        }
+
+        return $responseData;
+    }
+
+    /**
      * Get fiat account details by ID
      */
     public function getFiatAccount(string $fiatAccountId): array
@@ -621,6 +885,54 @@ class PaxosService
             'response_data' => $responseData,
         ]);
         throw new \Exception('Paxos API returned unexpected response. Status: '.$statusCode.'. Response: '.$responseBody);
+    }
+
+    /**
+     * List balances for a Paxos profile.
+     * GET /v2/profiles/{profile_id}/balances
+     *
+     * @param  list<string>|null  $assets  When set, only these assets are returned; omit for all balances.
+     * @return list<array{asset: string, available: string, trading: string}>
+     *
+     * @throws \Exception
+     */
+    public function listProfileBalances(string $profileId, ?array $assets = null): array
+    {
+        $this->ensureAuthenticated();
+
+        $url = "{$this->baseUrl}/v2/profiles/{$profileId}/balances";
+        if ($assets !== null && $assets !== []) {
+            $url .= '?'.collect($assets)->map(fn (string $a) => 'assets='.rawurlencode($a))->implode('&');
+        }
+
+        Log::info('Listing profile balances from Paxos', [
+            'url' => $url,
+            'profile_id' => $profileId,
+        ]);
+
+        $response = Http::withHeaders([
+            'Accept' => 'application/json',
+            'Authorization' => 'Bearer '.$this->apiToken,
+        ])->get($url);
+
+        if ($response->failed()) {
+            $errorBody = $response->json() ?? $response->body();
+            Log::error('Paxos list profile balances failed', [
+                'status' => $response->status(),
+                'profile_id' => $profileId,
+                'response' => $errorBody,
+            ]);
+            throw new \Exception('Failed to list profile balances from Paxos API. Status: '.$response->status().'. Response: '.json_encode($errorBody));
+        }
+
+        $responseData = $response->json();
+        if (! is_array($responseData)) {
+            return [];
+        }
+
+        $items = $responseData['items'] ?? $responseData['balances'] ?? [];
+
+        return is_array($items) ? $items : [];
     }
 
     /**

@@ -2,59 +2,54 @@
 
 @section('title', 'Accounts')
 
-@section('content')
-<div class="py-6">
-    <div class="flex justify-between items-center mb-6">
-        <h1 class="text-3xl font-bold text-gray-900">Accounts</h1>
-        <a href="{{ route('lender.accounts.create') }}" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded">
-            Create Account
-        </a>
-    </div>
+@section('page_actions')
+    <a href="{{ route('lender.accounts.create') }}" class="btn btn-primary rounded-3">
+        <i class="ti ti-plus me-1"></i> Create account
+    </a>
+@endsection
 
-    <div class="bg-white shadow overflow-hidden sm:rounded-md">
-        <ul class="divide-y divide-gray-200">
-            @forelse($accounts as $account)
-            <li>
-                <a href="{{ route('lender.accounts.show', $account) }}" class="block hover:bg-gray-50">
-                    <div class="px-4 py-4 sm:px-6">
-                        <div class="flex items-center justify-between">
-                            <div class="flex items-center">
-                                <p class="text-sm font-medium text-indigo-600 truncate">
-                                    {{ $account->type }} Account
-                                </p>
-                            </div>
-                            <div class="ml-2 flex-shrink-0 flex">
-                                @if($account->profile)
-                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
-                                    Has Profile
-                                </span>
+@section('content')
+    <div class="card shadow-sm border-0 rounded-4 overflow-hidden">
+        <div class="table-responsive">
+            <table class="table align-middle mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>Type</th>
+                        <th>Identity</th>
+                        <th>Description</th>
+                        <th>Profile</th>
+                        <th>Created</th>
+                        <th class="text-end">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @forelse ($accounts as $account)
+                        <tr>
+                            <td class="fw-semibold text-primary">{{ $account->type }}</td>
+                            <td>{{ $account->identity->first_name }} {{ $account->identity->last_name }}</td>
+                            <td class="text-muted">{{ $account->description ?? 'No description' }}</td>
+                            <td>
+                                @if ($account->profile)
+                                    <span class="badge rounded-pill text-bg-success">Has profile</span>
+                                @else
+                                    <span class="badge rounded-pill text-bg-secondary">None</span>
                                 @endif
-                            </div>
-                        </div>
-                        <div class="mt-2 sm:flex sm:justify-between">
-                            <div class="sm:flex">
-                                <p class="flex items-center text-sm text-gray-500">
-                                    {{ $account->identity->first_name }} {{ $account->identity->last_name }}
-                                </p>
-                                <p class="mt-2 flex items-center text-sm text-gray-500 sm:mt-0 sm:ml-6">
-                                    {{ $account->description ?? 'No description' }}
-                                </p>
-                            </div>
-                            <div class="mt-2 flex items-center text-sm text-gray-500 sm:mt-0">
-                                <p>
-                                    Created {{ $account->created_at->diffForHumans() }}
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-                </a>
-            </li>
-            @empty
-            <li class="px-4 py-8 text-center text-gray-500">
-                No accounts found. <a href="{{ route('lender.accounts.create') }}" class="text-indigo-600 hover:text-indigo-500">Create one</a>
-            </li>
-            @endforelse
-        </ul>
+                            </td>
+                            <td class="text-muted">{{ $account->created_at->diffForHumans() }}</td>
+                            <td class="text-end">
+                                <a href="{{ route('lender.accounts.show', $account) }}" class="btn btn-sm btn-outline-primary rounded-3">View</a>
+                            </td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="6" class="text-center text-muted py-5">
+                                No accounts found.
+                                <a href="{{ route('lender.accounts.create') }}" class="fw-semibold">Create one</a>
+                            </td>
+                        </tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
     </div>
-</div>
 @endsection

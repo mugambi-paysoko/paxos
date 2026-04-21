@@ -21,14 +21,20 @@ class RegisterController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:8|confirmed',
-            'role' => 'required|in:lender,borrower',
+            'role' => 'required|in:institution,individual,lender,borrower',
         ]);
+
+        $normalizedRole = match ($validated['role']) {
+            'lender' => 'institution',
+            'borrower' => 'individual',
+            default => $validated['role'],
+        };
 
         $user = User::create([
             'name' => $validated['name'],
             'email' => $validated['email'],
             'password' => Hash::make($validated['password']),
-            'role' => $validated['role'],
+            'role' => $normalizedRole,
         ]);
 
         Auth::login($user);

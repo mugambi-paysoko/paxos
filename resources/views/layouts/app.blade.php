@@ -1,3 +1,6 @@
+@if (auth()->check() && auth()->user()->can('lender'))
+    @include('layouts.partials.institution-shell')
+@else
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 <head>
@@ -29,6 +32,18 @@
                         <a href="{{ route('lender.profiles.index') }}" class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
                             Profiles
                         </a>
+                        <a href="{{ route('lender.fiat-accounts.index') }}" class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
+                            Fiat accounts
+                        </a>
+                        <a href="{{ route('lender.fiat-withdrawals.index') }}" class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
+                            Fiat withdrawals
+                        </a>
+                        <a href="{{ route('lender.crypto-withdrawals.index') }}" class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
+                            Crypto withdrawals
+                        </a>
+                        <a href="{{ route('lender.deposit-addresses.index') }}" class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
+                            Crypto addresses
+                        </a>
                         @endcan
                         @can('borrower')
                         <a href="{{ route('borrower.identities.index') }}" class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
@@ -40,11 +55,23 @@
                         <a href="{{ route('borrower.profiles.index') }}" class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
                             Profiles
                         </a>
+                        <a href="{{ route('borrower.fiat-accounts.index') }}" class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
+                            Fiat accounts
+                        </a>
+                        <a href="{{ route('borrower.fiat-withdrawals.index') }}" class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
+                            Fiat withdrawals
+                        </a>
+                        <a href="{{ route('borrower.crypto-withdrawals.index') }}" class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
+                            Crypto withdrawals
+                        </a>
+                        <a href="{{ route('borrower.deposit-addresses.index') }}" class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
+                            Crypto addresses
+                        </a>
                         @endcan
                     </div>
                 </div>
                 <div class="flex items-center">
-                    <span class="text-sm text-gray-700 mr-4">{{ auth()->user()->name }} ({{ auth()->user()->role }})</span>
+                    <span class="text-sm text-gray-700 mr-4">{{ auth()->user()->name }} ({{ auth()->user()->roleLabel() }})</span>
                     <form method="POST" action="{{ route('logout') }}">
                         @csrf
                         <button type="submit" class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
@@ -59,6 +86,8 @@
 
     <main class="py-6">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <x-in-app-notifications />
+
             @if(session('success'))
             <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-4" role="alert">
                 <span class="block sm:inline">{{ session('success') }}</span>
@@ -84,5 +113,7 @@
             @yield('content')
         </div>
     </main>
+    @stack('scripts')
 </body>
 </html>
+@endif

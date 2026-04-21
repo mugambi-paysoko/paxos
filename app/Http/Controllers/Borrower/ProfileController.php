@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Borrower;
 use App\Http\Controllers\Controller;
 use App\Models\Profile;
 use App\Services\PaxosService;
-use Illuminate\Http\Request;
 
 class ProfileController extends Controller
 {
@@ -23,6 +22,7 @@ class ProfileController extends Controller
     public function index()
     {
         $profiles = auth()->user()->profiles()->with('account.identity')->latest()->get();
+
         return view('borrower.profiles.index', compact('profiles'));
     }
 
@@ -36,16 +36,16 @@ class ProfileController extends Controller
             abort(403);
         }
 
-        $profile->load('account.identity', 'fiatDepositInstructions');
+        $profile->load('account.identity', 'fiatDepositInstructions', 'depositAddresses');
 
         // Fetch transfers for this profile from Paxos API
         $transfers = [];
         $transfersError = null;
-        
+
         if ($profile->paxos_profile_id) {
             try {
                 $transfers = $this->paxosService->getTransfers([$profile->paxos_profile_id]);
-                if (!is_array($transfers)) {
+                if (! is_array($transfers)) {
                     $transfers = [];
                 }
             } catch (\Exception $e) {
@@ -54,7 +54,7 @@ class ProfileController extends Controller
                     'profile_id' => $profile->id,
                     'paxos_profile_id' => $profile->paxos_profile_id,
                 ]);
-                $transfersError = 'Failed to fetch transfers: ' . $e->getMessage();
+                $transfersError = 'Failed to fetch transfers: '.$e->getMessage();
             }
         }
 

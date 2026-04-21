@@ -7,7 +7,6 @@ use App\Models\FiatAccount;
 use App\Models\Identity;
 use App\Services\PaxosService;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 
 class FiatAccountController extends Controller
@@ -26,6 +25,7 @@ class FiatAccountController extends Controller
     public function index()
     {
         $fiatAccounts = auth()->user()->fiatAccounts()->with('identity')->latest()->get();
+
         return view('lender.fiat-accounts.index', compact('fiatAccounts'));
     }
 
@@ -37,7 +37,7 @@ class FiatAccountController extends Controller
         $identities = auth()->user()->identities()
             ->whereNotNull('paxos_identity_id')
             ->get();
-        
+
         return view('lender.fiat-accounts.create', compact('identities'));
     }
 
@@ -48,22 +48,25 @@ class FiatAccountController extends Controller
     {
         $validated = $request->validate([
             'identity_id' => 'required|exists:identities,id',
+            'fiat_network' => 'required|in:WIRE,CUBIX',
             'first_name' => 'required|string|max:255',
             'last_name' => 'required|string|max:255',
-            'account_number' => 'required|string|max:255',
-            'routing_number' => 'required|string|max:255',
-            'routing_number_type' => 'required|in:ABA,SWIFT,OTHER',
-            'bank_name' => 'required|string|max:255',
-            'bank_country' => 'required|string|max:255',
+            'ref_id' => 'nullable|string|max:255',
+            'account_number' => 'nullable|string|max:255|required_if:fiat_network,WIRE',
+            'routing_number' => 'nullable|string|max:255|required_if:fiat_network,WIRE',
+            'routing_number_type' => 'nullable|in:ABA,SWIFT|required_if:fiat_network,WIRE',
+            'bank_name' => 'nullable|string|max:255|required_if:fiat_network,WIRE',
+            'bank_country' => 'nullable|string|max:255|required_if:fiat_network,WIRE',
             'bank_address1' => 'nullable|string|max:255',
             'bank_city' => 'nullable|string|max:255',
             'bank_province' => 'nullable|string|max:255',
             'bank_zip_code' => 'nullable|string|max:255',
-            'owner_address1' => 'required|string|max:255',
-            'owner_city' => 'required|string|max:255',
-            'owner_country' => 'required|string|max:255',
+            'owner_address1' => 'nullable|string|max:255|required_if:fiat_network,WIRE',
+            'owner_city' => 'nullable|string|max:255|required_if:fiat_network,WIRE',
+            'owner_country' => 'nullable|string|max:255|required_if:fiat_network,WIRE',
             'owner_province' => 'nullable|string|max:255',
             'owner_zip_code' => 'nullable|string|max:255',
+            'cubix_account_id' => 'nullable|string|max:255|required_if:fiat_network,CUBIX',
         ]);
 
         // Ensure identity belongs to user
@@ -74,7 +77,20 @@ class FiatAccountController extends Controller
         try {
             // Prepare data for Paxos API
             $paxosData = [
-                'fiat_network_instructions' => [
+                'fiat_account_owner' => [
+                    'person_details' => [
+                        'first_name' => $validated['first_name'],
+                        'last_name' => $validated['last_name'],
+                    ],
+                ],
+            ];
+
+            if (! empty($validated['ref_id'])) {
+                $paxosData['ref_id'] = $validated['ref_id'];
+            }
+
+            if ($validated['fiat_network'] === 'WIRE') {
+                $paxosData['fiat_network_instructions'] = [
                     'wire' => [
                         'account_number' => $validated['account_number'],
                         'routing_details' => [
@@ -97,14 +113,26 @@ class FiatAccountController extends Controller
                             'zip_code' => $validated['owner_zip_code'] ?? null,
                         ],
                     ],
-                ],
-                'fiat_account_owner' => [
-                    'person_details' => [
-                        'first_name' => $validated['first_name'],
-                        'last_name' => $validated['last_name'],
+                ];
+            } else {
+                $paxosData['fiat_network_instructions'] = [
+                    'cubix' => [
+                        'account_id' => $validated['cubix_account_id'],
                     ],
-                ],
-            ];
+                ];
+            }
+
+            // Third-party integrations must pass identity/account references.
+            if (! config('services.paxos.first_party', true)) {
+                $paxosData['identity_id'] = $identity->paxos_identity_id;
+                $linkedAccount = $identity->accounts()
+                    ->whereNotNull('paxos_account_id')
+                    ->latest()
+                    ->first();
+                if ($linkedAccount) {
+                    $paxosData['account_id'] = $linkedAccount->paxos_account_id;
+                }
+            }
 
             // Call Paxos API - this will throw an exception if it fails
             $paxosResponse = $this->paxosService->createFiatAccount($paxosData);
@@ -124,7 +152,7 @@ class FiatAccountController extends Controller
 
             return redirect()->route('lender.fiat-accounts.show', $fiatAccount)
                 ->with('success', 'Fiat account created successfully!');
-                
+
         } catch (\Exception $e) {
             Log::error('Failed to create fiat account', [
                 'error' => $e->getMessage(),
@@ -134,7 +162,7 @@ class FiatAccountController extends Controller
 
             return back()
                 ->withInput()
-                ->withErrors(['error' => 'Failed to create fiat account in Paxos. Please try again. Error: ' . $e->getMessage()]);
+                ->withErrors(['error' => 'Failed to create fiat account in Paxos. Please try again. Error: '.$e->getMessage()]);
         }
     }
 
@@ -149,6 +177,7 @@ class FiatAccountController extends Controller
         }
 
         $fiatAccount->load('identity');
+
         return view('lender.fiat-accounts.show', compact('fiatAccount'));
     }
 
@@ -189,7 +218,7 @@ class FiatAccountController extends Controller
 
             return redirect()->route('lender.fiat-accounts.show', $fiatAccount)
                 ->with('success', $message);
-                
+
         } catch (\Exception $e) {
             Log::error('Failed to refresh fiat account', [
                 'error' => $e->getMessage(),
@@ -197,7 +226,7 @@ class FiatAccountController extends Controller
             ]);
 
             return redirect()->route('lender.fiat-accounts.show', $fiatAccount)
-                ->with('error', 'Failed to refresh fiat account from Paxos. Error: ' . $e->getMessage());
+                ->with('error', 'Failed to refresh fiat account from Paxos. Error: '.$e->getMessage());
         }
     }
 }
